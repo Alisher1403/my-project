@@ -16,6 +16,7 @@
   --element-background: #1a282d;
   --element-background-hover: #223237;
   --content-background-hover: #131f23;
+  --element-color: rgb(225, 130, 72);
 
   --title-color: #f2f4f5e4;
   --icon-color: var(--title-color);

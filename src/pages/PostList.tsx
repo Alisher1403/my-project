@@ -6,13 +6,14 @@ import styled from "styled-components";
 import utils from "utils";
 
 const PostList: FC = () => {
-  const posts = useSelector((state: RootState) => state.post.data);
+  const posts = useSelector((state: RootState) => state.post.list.data);
+  console.log(posts);
 
   return (
     <Container>
       <Content>
         <ul className="post-list">
-          {Object.entries(posts)?.map(([key, elem]) => {
+          {posts?.map((elem, key) => {
             const reaction = elem?.reaction?.[0]?.type;
             console.log(elem);
 
@@ -51,7 +52,7 @@ const PostList: FC = () => {
                             thumb_up
                           </span>
                         </button>
-                        <p>{utils.likes.count(elem?.likes?.[0]?.count)}</p>
+                        <p>{utils.count(elem?.likes?.[0]?.count)}</p>
                         <button className="group-btn">
                           <span
                             className={`material-symbols-outlined icon ${
