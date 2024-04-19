@@ -2,5 +2,8 @@ import Post from "./Post";
 import MainPage from "./MainPage";
 import Login from "./Login";
 import Create from "./Create";
+import Profile from "./Profile";
+import Edit from "./Edit";
+import Groups from "./Groups";
 
-export { Post, MainPage, Login, Create };
+export { Post, MainPage, Login, Create, Profile, Edit, Groups };

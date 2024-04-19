@@ -36,7 +36,12 @@ const Options: FC<Props> = ({ options }) => {
                     <button
                       className="option"
                       key={index}
-                      onClick={item.onClick}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (item.onClick) {
+                          item.onClick(e);
+                        }
+                      }}
                     >
                       <span className="material-symbols-outlined icon">
                         {item.icon}

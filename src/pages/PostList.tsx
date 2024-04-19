@@ -1,87 +1,58 @@
 import { FC } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import { RootState } from "store";
 import styled from "styled-components";
-import utils from "utils";
+import PostCard from "../components/PostCard";
+import Searchbar from "../components/Searchbar";
+import Aside from "../components/Aside";
+import { Link } from "react-router-dom";
 
 const PostList: FC = () => {
   const posts = useSelector((state: RootState) => state.post.list.data);
-  console.log(posts);
 
   return (
     <Container>
       <Content>
-        <ul className="post-list">
-          {posts?.map((elem, key) => {
-            const reaction = elem?.reaction?.[0]?.type;
-            console.log(elem);
-
-            return (
-              <li key={key} className="post">
-                <Link to={`/post/${elem.id}`}>
-                  <div className="post-container">
-                    <div className="user">
-                      <div className="user-left">
-                        <div className="user-img">
-                          {elem.user.img ? (
-                            <img src={elem.user.img ?? " "} alt="" />
-                          ) : (
-                            elem.user.name[0]
-                          )}
-                        </div>
-                      </div>
-                      <div className="user-right">
-                        <div className="user-name">{elem.user.name}</div>
-                        <span className="divider">•</span>
-                        <div className="user-post-created-at">
-                          {utils.timeAgo(elem.created_at)}
-                        </div>
-                      </div>
-                    </div>
-                    <h3 className="title">{elem.title}</h3>
-                    <div className="post-content">{elem.content}</div>
-                    <div className="post-details">
-                      <div className="group">
-                        <button className="group-btn">
-                          <span
-                            className={`material-symbols-outlined icon ${
-                              reaction === "like" && "filled"
-                            }`}
-                          >
-                            thumb_up
-                          </span>
-                        </button>
-                        <p>{utils.count(elem?.likes?.[0]?.count)}</p>
-                        <button className="group-btn">
-                          <span
-                            className={`material-symbols-outlined icon ${
-                              reaction === "dislike" && "filled"
-                            }`}
-                          >
-                            thumb_down
-                          </span>
-                        </button>
-                      </div>
-                      <button>
-                        <span className="material-symbols-outlined icon">
-                          comment
-                        </span>
-                        <p>{elem?.comments?.[0]?.count}</p>
-                      </button>
-                      <button>
-                        <span className="material-symbols-outlined icon">
-                          ios_share
-                        </span>
-                        <p>Share</p>
-                      </button>
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="header">
+          <h1 className="title">Welcome to CommunityClub.com™</h1>
+          <p className="subtitle">
+            Give & receive support in more than 50 support groups. Use the
+            search bar below to find a group or search the entire site.
+          </p>
+          <Searchbar />
+        </div>
+        <Main>
+          <div className="content">
+            <div className="left">
+              <Aside />
+            </div>
+            <div className="center">
+              <h2>Latest Topics</h2>
+              <ul className="post-list">
+                {posts?.map((elem, key) => {
+                  return (
+                    <li key={key} className="post">
+                      <PostCard elem={elem} />
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <div className="right box-style">
+              <h2 className="title">Welcome</h2>
+              <p className="text">
+                Tired of scrolling through the same posts? When you create an
+                account you’ll always come back to where you left off. With an
+                account you can also be notified of new replies, save bookmarks,
+                and use likes to thank others. We can all work together to make
+                this community great.
+              </p>
+              <Link to={`login?type=sign-up`} className="custom-btn">
+                Sign Up
+              </Link>
+            </div>
+          </div>
+        </Main>
         <div className="page-info"></div>
       </Content>
     </Container>
@@ -93,153 +64,61 @@ export default PostList;
 const Container = styled.div``;
 
 const Content = styled.div`
-  .post-list {
-    width: 100%;
-    border-top: 0.5px solid var(--border-color-dark);
-    margin-top: 50px;
+  .header {
+    padding-top: 50px;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-    .post {
+    .title {
+      font-size: 35px;
+      font-family: var(--font-bold);
+      color: var(--title-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      font-family: var(--font-regular);
+      color: var(--text-color);
+      margin-bottom: 20px;
+    }
+  }
+`;
+
+const Main = styled.div`
+  .content {
+    position: relative;
+    display: grid;
+    grid-template-columns: 300px auto 300px;
+    align-items: flex-start;
+    column-gap: 30px;
+
+    h2 {
+      font-size: 22px;
+      font-family: var(--font-bold);
+      color: var(--title-color);
+    }
+
+    .left {
+      position: sticky;
+      top: 0;
+    }
+
+    .center {
       width: 100%;
-      border-bottom: 0.5px solid var(--border-color-dark);
-      padding: 5px 0;
+    }
 
-      .post-container {
-        padding: 5px 15px;
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        border-radius: 15px;
+    .right {
+      position: sticky;
+      top: 0;
 
-        &:hover {
-          background-color: var(--content-background-hover);
-        }
-
-        .user {
-          display: flex;
-          align-items: center;
-          column-gap: 10px;
-          margin-bottom: 10px;
-
-          .user-left {
-            .user-img {
-              height: 25px;
-              aspect-ratio: 1/1;
-              background-color: var(--element-background-hover);
-              border-radius: 50%;
-              overflow: hidden;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              font-family: var(--font-regular);
-              font-size: 16px;
-              color: var(--text-color);
-              text-transform: uppercase;
-
-              img {
-                height: 100%;
-                width: 100%;
-                object-fit: cover;
-              }
-            }
-          }
-
-          .user-right {
-            display: flex;
-            column-gap: 5px;
-            align-items: center;
-
-            .user-name {
-              font-family: var(--font-regular);
-              font-size: 13px;
-              color: var(--text-color);
-              opacity: 0.9;
-            }
-
-            .divider {
-              color: var(--text-color);
-            }
-
-            .user-post-created-at {
-              font-family: var(--font-light);
-              font-size: 12px;
-              color: var(--text-color);
-              opacity: 0.7;
-            }
-          }
-        }
-
-        .title {
-          margin-bottom: 10px;
-          color: var(--title-color);
-          font-weight: normal;
-          font-family: var(--font-medium);
-          font-size: 20px;
-        }
-
-        .post-content {
-          width: 100%;
-          overflow: hidden;
-          margin-bottom: 10px;
-          font-size: 15px;
-          color: var(--text-color);
-
-          img {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-          }
-        }
-
-        .post-details {
-          margin-top: 10px;
-          display: flex;
-          column-gap: 10px;
-
-          .group {
-            display: flex;
-            align-items: center;
-            background: var(--element-background);
-            border-radius: 50px;
-
-            p {
-              padding: 0 5px;
-              font-size: 13px;
-              font-family: var(--font-medium);
-              color: var(--title-color);
-            }
-
-            .group-btn {
-              padding: 6px;
-              cursor: pointer;
-              border: none;
-            }
-          }
-
-          button {
-            display: flex;
-            align-items: center;
-            padding: 5px 10px;
-            background-color: var(--element-background);
-            border-radius: 50px;
-            cursor: pointer;
-            color: var(--title-color);
-
-            .icon {
-              font-size: 22px;
-            }
-
-            &:hover {
-              background: var(--element-background-hover);
-            }
-
-            p {
-              padding: 0 5px;
-              font-size: 13px;
-              font-family: var(--font-medium);
-              color: var(--title-color);
-            }
-          }
-        }
+      .title {
+        margin-bottom: 10px;
+      }
+      .text {
+        margin-bottom: 20px;
       }
     }
   }

@@ -136,6 +136,17 @@ const post = createSlice({
       }
     });
 
+    builder.addCase(deletePost.fulfilled, (state, action) => {
+      if (action.payload) {
+        const { key } = action.payload;
+
+        if (state.list.data) {
+          const returnData = state.list.data?.filter((e) => e.id !== key);
+          state.list.data = returnData;
+        }
+      }
+    });
+
     builder.addCase(LoadComments.fulfilled, (state, action) => {
       const { key, data, count } = action.payload;
 
@@ -297,7 +308,7 @@ const getPostList = createAsyncThunk("getPostList", async () => {
     const { data, error } = await supabase
       .from("posts")
       .select(
-        `*, user: user_metadata(*), likes: post_reactions(count), dislikes: post_reactions(count)`
+        `*, user: user_metadata(*), likes: post_reactions(count), dislikes: post_reactions(count), comments: comments(count)`
       )
       .eq("likes.type", "like")
       .eq("dislikes.type", "like");
@@ -319,7 +330,7 @@ const getPost = createAsyncThunk(
     const user_id = state.user.data?.id;
 
     let selectString = `*, user: user_metadata(*), 
-    likes: post_reactions(count), dislikes: post_reactions(count)`;
+    likes: post_reactions(count), dislikes: post_reactions(count), comments: comments(count)`;
 
     if (user_id) {
       selectString += `, reaction: post_reactions(type)`;
@@ -337,9 +348,62 @@ const getPost = createAsyncThunk(
     }
 
     const { data, error }: any = await query;
-    console.log(data);
 
     return { key: id, data, error };
+  }
+);
+
+const updatePost = createAsyncThunk(
+  "updatePost",
+  async (args: { id: string; post: any }, { getState }) => {
+    const { id, post } = args;
+    const state = getState() as RootState;
+    const user_id = state.user.data?.id;
+
+    if (!user_id) return;
+
+    const { data }: any = await supabase
+      .from("posts")
+      .update(post)
+      .eq("id", id);
+
+    return { key: id, data };
+  }
+);
+
+const deletePost = createAsyncThunk(
+  "deletePost",
+  async (id: string, { getState }) => {
+    const state = getState() as RootState;
+    const user_id = state.user.data?.id;
+
+    if (!user_id) return;
+    await supabase.from("posts").delete().eq("id", id);
+
+    return { user_id, key: id };
+  }
+);
+
+const postPost = createAsyncThunk(
+  "postPost",
+  async (
+    post: { title: string; content: string; category: string[] },
+    { getState }
+  ) => {
+    const state = getState() as RootState;
+    const user_id = state.user.data?.id;
+
+    if (!user_id) {
+      return null;
+    }
+
+    const { data, error }: any = await supabase
+      .from("posts")
+      .insert({ ...post, user_id });
+
+    console.log(data);
+
+    return { data, error };
   }
 );
 
@@ -575,6 +639,9 @@ const PostPostLike = createAsyncThunk(
 
 export const postApi = {
   get: getPost,
+  post: postPost,
+  update: updatePost,
+  delete: deletePost,
   like: PostPostLike,
   subscribers: {
     post: postSubscribers,

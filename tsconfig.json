@@ -24,7 +24,6 @@
       "store": ["./src/store"],
       "store/*": ["./src/store/*"],
       "backend": ["./backend"],
-      "layouts": ["./src/layouts"],
       "components": ["./src/components"],
       "icons": ["./src/assets/icons"],
       "ui": ["./src/ui"],
